@@ -51,13 +51,17 @@ public class Enseignant extends Personne {
      *
      */
     public int heuresPrevuesPourUE(UE ue) {
-        float tmp = 0;
-        for (ServicePrevu s : servicesPrevus) {
-            if (s.getEnseignement() == ue) {
-                tmp += s.getVolumeTD() + s.getVolumeCM() * 1.5 + s.getVolumeTP() * 0.75;
+        if (null == ue) {
+            throw new IllegalArgumentException("ue ne peut pas être null");
+        } else {
+            float tmp = 0;
+            for (ServicePrevu s : servicesPrevus) {
+                if (s.getEnseignement() == ue) {
+                    tmp += s.getVolumeTD() + s.getVolumeCM() * 1.5 + s.getVolumeTP() * 0.75;
+                }
             }
+            return (int) tmp;
         }
-        return (int) tmp;
     }
 
     /**
@@ -69,8 +73,12 @@ public class Enseignant extends Personne {
      * @param volumeTP le volume d'heures de TP
      */
     public void ajouteEnseignement(UE ue, int volumeCM, int volumeTD, int volumeTP) {
-        ServicePrevu s = new ServicePrevu(ue, this, volumeCM, volumeTD, volumeTP);
-        servicesPrevus.add(s);
+        if (null == ue) {
+            throw new IllegalArgumentException("ue ne peut pas être null");
+        } else {
+            ServicePrevu s = new ServicePrevu(ue, this, volumeCM, volumeTD, volumeTP);
+            servicesPrevus.add(s);
+        }
     }
 
     /**
@@ -79,32 +87,40 @@ public class Enseignant extends Personne {
      * @param inter l'intervention concernée
      */
     public void ajouteIntervention(Intervention inter) {
-        interventionsPlanifiees.add(inter);
+        if (null == inter) {
+            throw new IllegalArgumentException("intervention ne peut pas être null");
+        } else {
+            interventionsPlanifiees.add(inter);
+        }
     }
 
     public int resteAPlanifier(UE ue, TypeIntervention type) {
-        float prevu = 0;
-        for (ServicePrevu s : servicesPrevus) {
-            if (s.getEnseignement() == ue) {
-                switch (type) {
-                    case CM:
-                        prevu += s.getVolumeCM();
-                        break;
-                    case TD:
-                        prevu += s.getVolumeTD();
-                        break;
-                    case TP:
-                        prevu += s.getVolumeTP();
-                        break;
+        if (null == ue || null == type) {
+            throw new IllegalArgumentException("ue et type ne peuvent pas être null");
+        } else {
+            float prevu = 0;
+            for (ServicePrevu s : servicesPrevus) {
+                if (s.getEnseignement() == ue) {
+                    switch (type) {
+                        case CM:
+                            prevu += s.getVolumeCM();
+                            break;
+                        case TD:
+                            prevu += s.getVolumeTD();
+                            break;
+                        case TP:
+                            prevu += s.getVolumeTP();
+                            break;
+                    }
                 }
             }
-        }
-        int planifie = 0;
-        for (Intervention i : interventionsPlanifiees) {
-            if (i.getMatiere() == ue && i.getType()==type) {
-                planifie+=i.getDuree();
+            int planifie = 0;
+            for (Intervention i : interventionsPlanifiees) {
+                if (i.getMatiere() == ue && i.getType() == type) {
+                    planifie += i.getDuree();
+                }
             }
+            return (int) (prevu) - planifie;
         }
-        return (int)(prevu)-planifie;
     }
 }
